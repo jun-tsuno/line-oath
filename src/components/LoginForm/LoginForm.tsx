@@ -1,14 +1,12 @@
 'use client';
 
-export const LoginForm = () => {
-	const handleLineLogin = async () => {
-		const channelId = process.env.NEXT_PUBLIC_LINE_CHANNEL_ID as string;
-		const redirectUrl = process.env.NEXT_PUBLIC_LINE_REDIRECT_URL as string;
-		const encodedRedirectUri = encodeURIComponent(redirectUrl);
-		const state = process.env.NEXT_PUBLIC_LINE_STATE as string;
-		const loginUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${channelId}&redirect_uri=${encodedRedirectUri}&state=${state}&scope=profile%20openid%20email`;
+import { useRouter } from 'next/navigation';
 
-		window.location.href = loginUrl;
+export const LoginForm = () => {
+	const router = useRouter();
+
+	const handleLineLogin = () => {
+		router.push('http://localhost:3000/api/auth/login');
 	};
 
 	return (

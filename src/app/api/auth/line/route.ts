@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 
 /**
  * LINEプラットフォームからのリダイレクト先
@@ -57,18 +56,16 @@ export async function GET(request: NextRequest) {
 
 		const profile = await profileResponse.json();
 
-		// クッキーにプロフィール情報を保存
-		cookies().set({
-			name: 'lineProfile',
-			value: JSON.stringify(profile),
-			path: '/',
-			httpOnly: true, // クライアントサイドのJavaScriptからアクセスできないようにする
-			secure: process.env.NODE_ENV === 'development' ? false : true, // HTTPSを使用している場合にのみ送信
-			sameSite: 'lax', // CSRF攻撃を防ぐため
-		});
+		// クライアント側にプロフィール情報を送信するためのリダイレクト
+		// クエリパラメータとして情報を渡す
+		const redirectUrl = new URL('/home', process.env.NEXT_PUBLIC_BASE_URL);
+		redirectUrl.searchParams.append('displayName', profile.displayName);
+		redirectUrl.searchParams.append('userId', profile.userId);
+		if (profile.pictureUrl) {
+			redirectUrl.searchParams.append('pictureUrl', profile.pictureUrl);
+		}
 
-		// ログイン後のページにリダイレクト
-		return NextResponse.redirect('http://localhost:3000/home');
+		return NextResponse.redirect(redirectUrl.toString());
 	} catch (error) {
 		console.error('Error during LINE token exchange or profile fetch:', error);
 		return NextResponse.json(

@@ -1,11 +1,16 @@
-import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 
-const HomePage = () => {
-	const cookieStore = cookies();
-	const profileCookie = cookieStore.get('lineProfile');
-	const profile = profileCookie ? JSON.parse(profileCookie.value) : null;
+const HomePage = async ({
+	searchParams,
+}: {
+	searchParams: { [key: string]: string | string[] | undefined };
+}) => {
+	const profile = searchParams as {
+		displayName: string;
+		pictureUrl: string;
+		userId: string;
+	};
 
 	if (!profile) return notFound();
 
